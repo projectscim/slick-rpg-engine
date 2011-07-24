@@ -1,0 +1,12 @@
+#summary A list of features yet to come
+
+This list will be expanded once I wrap my head around what my plans and goals with this engine really are.
+
+== Short term goals ==
+
+ * Saving/loading the current state of the game (position, progress, global variables, etc.)
+ * Animated tiles
+
+== Long term goals ==
+
+ * Live action combat system (take Zelda for example)
