@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="25" height="20" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="east" value="testmap2"/>
+  <property name="south" value="testmap2"/>
+  <property name="west" value="testmap2"/>
+ </properties>
+ <tileset firstgid="1" name="tileset" tilewidth="32" tileheight="32">
+  <image source="../tiles/tileset.png" trans="00ff00" width="896" height="1385"/>
+ </tileset>
+ <layer name="Boden" width="25" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC5vJwMAwcxSP4lE8ikfxKB7FQxoDAE4RacbQBwAA
+  </data>
+ </layer>
+ <layer name="Auf Boden" width="25" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC2NgGFzgMRA/AeKnQPyMRnb8BxGMQATETIw0smQUjIJRMApGwSigIwAAOih6XtAHAAA=
+  </data>
+ </layer>
+ <layer name="Wand" width="25" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC1NiYGAQoCEWBmI7BtoCn1E7Ru0YtWNE2KHEQFr5E0OiegMgnkRjfyygsfmjYOQCADU4HhrQBwAA
+  </data>
+ </layer>
+ <layer name="Decke" width="25" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC2NgYGBQA2J1LFgDiLUYEKAWBxsG+IFYjhmC+bHIUwtYMUPwKBgFo2AU4AK1aPQoGAXDHQAAkpd4QtAHAAA=
+  </data>
+ </layer>
+ <objectgroup name="Objects" width="25" height="20">
+  <object name="Player Starter" type="playerStart" x="383" y="479" width="32" height="32"/>
+ </objectgroup>
+ <layer name="Kollision" width="25" height="20" opacity="0.48">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC3NgYWBwoAMmFhCjD12OFnYQspMWYNSOUTtG7SBsB6nlDi3LK3L9MQpGAS0AABSIwj3QBwAA
+  </data>
+ </layer>
+</map>
