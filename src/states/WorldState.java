@@ -13,6 +13,7 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
+import tools.ResourceManager;
 import entities.Player;
 
 public class WorldState extends BasicGameState {
@@ -24,9 +25,9 @@ public class WorldState extends BasicGameState {
 
 	@Override
 	public void init(GameContainer container, StateBasedGame game) throws SlickException {
-		new Player(new SpriteSheet("resources/sprites/character3.png", 32, 32));
+		new Player(new SpriteSheet(ResourceManager.getImage("character3"), 32, 32));
 
-		Engine.loadMap("resources/maps/testmap.tmx");
+		Engine.loadMap(ResourceManager.getMap("testmap"));
 
 		defineControls();
 	}

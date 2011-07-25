@@ -21,13 +21,15 @@ public class Globals {
 	public static final String DIRECTORY_MAPS = "resources/maps";
 	public static final String DIRECTORY_IMAGES = "resources/images";
 	public static final String DIRECTORY_TILES = "resources/tiles";
-	
+	public static final String DIRECTORY_SFX = "resources/sfx";
+	public static final String DIRECTORY_MUSIC = "resources/music";
+
 	// animations
 	public static final String ANIMATION_DOWN = "down";
 	public static final String ANIMATION_UP = "up";
 	public static final String ANIMATION_LEFT = "left";
 	public static final String ANIMATION_RIGHT = "right";
-	
+
 	// state IDs
 	public static final int STATE_WORLD = 10;
 

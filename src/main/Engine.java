@@ -1,5 +1,6 @@
 package main;
 
+import interfaces.Block;
 import interfaces.TiledMapTransition;
 
 import java.util.HashMap;
@@ -17,9 +18,8 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.Transition;
 
-import tools.FontFactory;
+import tools.ResourceManager;
 import entities.AbstractEntity;
-import entities.blocks.Block;
 
 /**
  * Static utility main class of the Engine. Keeps track of all the entities and
@@ -48,26 +48,22 @@ public class Engine {
 	 *            - the reference to the map
 	 * @param setActive
 	 *            - wether to set this map active
-	 * @return Map - the newly created {@link Map}
 	 */
-	public static Map loadMap(String string, boolean setActive) {
+	public static void loadMap(String string, boolean setActive) {
 		clearEntities();
 
 		try {
-			Map map = new Map(string, setActive);
-			return map;
+			new Map(string, setActive);
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
-
-		return null;
 	}
 
 	/**
 	 * @see Engine#loadMap(String, boolean)
 	 */
-	public static Map loadMap(String string) {
-		return Engine.loadMap(string, true);
+	public static void loadMap(String string) {
+		Engine.loadMap(string, true);
 	}
 
 	/**
@@ -141,12 +137,15 @@ public class Engine {
 	 *            - the {@link StateBasedGame} object
 	 * @param container
 	 *            - the {@link GameContainer} of the app
+	 * @throws SlickException
 	 */
-	public static void init(StateBasedGame game, GameContainer container) {
+	public static void init(StateBasedGame game, GameContainer container) throws SlickException {
 		Engine.game = game;
 		Engine.container = container;
-		FontFactory.createFonts();
-		container.setDefaultFont(FontFactory.getFont("fipps"));
+
+		ResourceManager.load();
+
+		container.setDefaultFont(ResourceManager.getFont("fipps"));
 	}
 
 	/**

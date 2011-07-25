@@ -28,6 +28,8 @@ public abstract class AbstractEntity implements Entity {
 	private float x, y;
 	private float width, height;
 	private float scale = 1.0f;
+	private float alpha = 1.0f;
+	private float rotation = 0;
 
 	private boolean fillMode = false;
 	private boolean solid = true;
@@ -37,7 +39,7 @@ public abstract class AbstractEntity implements Entity {
 
 	private String id = "undefined";
 	private Image image;
-	private Color color;
+	private Color color = Color.white;
 	private Rectangle body;
 
 	private Animation currentAnimation;
@@ -73,6 +75,15 @@ public abstract class AbstractEntity implements Entity {
 
 	protected void initAnimations(SpriteSheet sheet) {
 		return;
+	}
+
+	public float getDistance(AbstractEntity other) {
+		float dx = getBody().getCenterX() - other.getBody().getCenterX();
+		float dy = getBody().getCenterY() - other.getBody().getCenterY();
+
+		float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+		return distance;
 	}
 
 	public Entity getCollidingEntity(int direction) {
@@ -120,17 +131,20 @@ public abstract class AbstractEntity implements Entity {
 
 	@Override
 	public void render(Graphics g) {
+		Color c = new Color(color.r, color.g, color.b, alpha);
+
 		if (currentAnimation != null) {
-			currentAnimation.draw(x, y, color);
+			currentAnimation.getCurrentFrame().setRotation(rotation);
+			currentAnimation.draw(x, y, c);
 		} else if (image != null) {
-			image.draw(x, y, scale, color);
+			image.draw(x, y, scale, c);
 		} else {
 			Color oldColor = g.getColor();
 			if (fillMode) {
-				g.setColor(color);
+				g.setColor(c);
 				g.fill(body);
 			} else {
-				g.setColor(color);
+				g.setColor(c);
 				g.draw(body);
 			}
 			g.setColor(oldColor);
@@ -358,6 +372,22 @@ public abstract class AbstractEntity implements Entity {
 
 	public void setCanMove(boolean canMove) {
 		this.canMove = canMove;
+	}
+
+	public float getAlpha() {
+		return alpha;
+	}
+
+	public void setAlpha(float alpha) {
+		this.alpha = alpha;
+	}
+
+	public float getRotation() {
+		return rotation;
+	}
+
+	public void setRotation(float rotation) {
+		this.rotation = rotation;
 	}
 
 }
