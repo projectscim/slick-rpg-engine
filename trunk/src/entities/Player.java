@@ -106,10 +106,4 @@ public class Player extends AbstractEntity {
 		}
 	}
 
-	@Override
-	protected void updateBody() {
-		super.updateBody();
-		getBody().grow(-4f, -1f);
-	}
-
 }

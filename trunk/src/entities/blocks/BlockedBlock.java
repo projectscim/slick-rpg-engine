@@ -1,18 +1,19 @@
 package entities.blocks;
 
+import interfaces.Block;
+
 import org.newdawn.slick.Color;
 
 import entities.AbstractEntity;
 
 /**
- * Invisible entity in the game world. It's solid and thus no normal entity can
- * walk through it.
+ * This entity indicates where no normal entity can walk.
  * 
  * @author Benny
  */
-public class Block extends AbstractEntity {
+public class BlockedBlock extends AbstractEntity implements Block {
 
-	public Block(float x, float y, float width, float height) {
+	public BlockedBlock(float x, float y, float width, float height) {
 		super(x, y, width, height);
 		setColor(Color.red);
 		setFillMode(true);

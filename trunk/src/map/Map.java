@@ -2,8 +2,11 @@ package map;
 
 import interfaces.TransitionAction;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import main.Engine;
 import main.camera.Camera;
@@ -12,11 +15,16 @@ import main.constants.MapObjects;
 
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.tiled.TiledMap;
 
+import scripts.AbstractTileScript;
 import tools.MapChangeTransition;
+import tools.ResourceManager;
 import entities.AbstractEntity;
-import entities.blocks.Block;
+import entities.blocks.BlockedBlock;
+import entities.blocks.ScriptBlock;
+import entities.blocks.TeleportBlock;
 
 /**
  * A <code>Map</code> loads and holds a TiledMap object and is responsible for
@@ -26,14 +34,13 @@ import entities.blocks.Block;
  */
 public class Map {
 
+	private static HashMap<String, Map> mapsCache = new HashMap<String, Map>();
+
 	private TiledMap map = null;
+	private HashMap<Integer, String> transitions = new HashMap<Integer, String>();
 
 	private int widthTiles, heightTiles;
 	private int width, height;
-
-	private static HashMap<String, Map> mapsCache = new HashMap<String, Map>();
-	private HashMap<String, MapObject> objects = new HashMap<String, MapObject>();
-	private HashMap<Integer, String> transitions = new HashMap<Integer, String>();
 
 	private int entitiesLayerIndex = -1;
 	private int maxLayerIndex = -1;
@@ -59,10 +66,6 @@ public class Map {
 		loadAdjacentMaps();
 		setBounds();
 
-		if (setActive) {
-			Engine.setMap(this);
-		}
-
 		maxLayerIndex = map.getLayerCount();
 		entitiesLayerIndex = map.getLayerIndex(MapObjects.LAYER_OBJECTS);
 
@@ -72,7 +75,11 @@ public class Map {
 			new Camera(Engine.getEntity(MapObjects.ENTITY_PLAYER));
 		}
 
-		mapsCache.put(mapFile, this);
+		if (setActive) {
+			Engine.setMap(this);
+		}
+
+		addMapToCache(mapFile, this);
 	}
 
 	/**
@@ -128,13 +135,15 @@ public class Map {
 			String newMap = map.getMapProperty(way, null);
 			if (newMap != null) {
 				if (way.equals("north")) {
-					transitions.put(Globals.DIRECTION_UP, Globals.DIRECTORY_MAPS + "/" + newMap + ".tmx");
+					transitions.put(Globals.DIRECTION_UP, ResourceManager.getMap(newMap));
 				} else if (way.equals("east")) {
-					transitions.put(Globals.DIRECTION_RIGHT, Globals.DIRECTORY_MAPS + "/" + newMap + ".tmx");
+					transitions.put(Globals.DIRECTION_RIGHT, ResourceManager.getMap(newMap));
 				} else if (way.equals("south")) {
-					transitions.put(Globals.DIRECTION_DOWN, Globals.DIRECTORY_MAPS + "/" + newMap + ".tmx");
+					transitions.put(Globals.DIRECTION_DOWN, ResourceManager.getMap(newMap));
 				} else if (way.equals("west")) {
-					transitions.put(Globals.DIRECTION_LEFT, Globals.DIRECTORY_MAPS + "/" + newMap + ".tmx");
+					// transitions.put(Globals.DIRECTION_LEFT,
+					// Globals.DIRECTORY_MAPS + "/" + newMap + ".tmx");
+					transitions.put(Globals.DIRECTION_LEFT, ResourceManager.getMap(newMap));
 				}
 			}
 		}
@@ -152,15 +161,6 @@ public class Map {
 		}
 	}
 
-	public MapObject getObject(String type) {
-		return objects.get(type);
-	}
-
-	public Vector<MapObject> getObjects(String... type) {
-		// TODO implement this
-		return null;
-	}
-
 	private void setBounds() {
 		widthTiles = map.getWidth();
 		heightTiles = map.getHeight();
@@ -173,14 +173,66 @@ public class Map {
 		for (int groupID = 0; groupID < groups; groupID++) {
 			int objectsInGroup = map.getObjectCount(groupID);
 			for (int objectID = 0; objectID < objectsInGroup; objectID++) {
-				if (map.getObjectType(groupID, objectID).equals(MapObjects.OBJECT_PLAYERSTART)) {
-					MapObject playerStart = new MapObject(MapObjects.OBJECT_PLAYERSTART, map.getObjectX(groupID, objectID), map.getObjectY(groupID, objectID), map.getObjectWidth(groupID, objectID), map.getObjectHeight(groupID, objectID));
-					objects.put(MapObjects.OBJECT_PLAYERSTART, playerStart);
+				int x = map.getObjectX(groupID, objectID);
+				int y = map.getObjectY(groupID, objectID);
+				int width = map.getObjectWidth(groupID, objectID);
+				int height = map.getObjectHeight(groupID, objectID);
 
+				if (map.getObjectType(groupID, objectID).equals(MapObjects.OBJECT_PLAYERSTART)) {
 					AbstractEntity player = Engine.getEntity(MapObjects.ENTITY_PLAYER);
 					if (player.getX() == 0 && player.getY() == 0) {
-						player.setX(playerStart.getX());
-						player.setY(playerStart.getY());
+						player.setX(x);
+						player.setY(y);
+					}
+				} else if (map.getObjectType(groupID, objectID).equals(MapObjects.OBJECT_TELEPORT)) {
+					TeleportBlock tb = new TeleportBlock(x, y, width, height);
+					tb.setTargetX(Integer.parseInt(map.getObjectProperty(groupID, objectID, "x", "0")));
+					tb.setTargetY(Integer.parseInt(map.getObjectProperty(groupID, objectID, "y", "0")));
+				}
+			}
+		}
+
+		// load sripts
+		int layers = map.getLayerCount();
+		for (int layer = 0; layer < layers; layer++) {
+			for (int x = 0; x < map.getWidth(); x++) {
+				for (int y = 0; y < map.getHeight(); y++) {
+					int tileID = map.getTileId(x, y, layer);
+
+					String scriptName = map.getTileProperty(tileID, "script", null);
+					if (scriptName != null) {
+						try {
+							HashMap<String, Object> data = new HashMap<String, Object>();
+
+							// get all the properties for this tile
+							Properties props = map.findTileSet(tileID).getProperties(tileID);
+							Iterator<Entry<Object, Object>> iter = props.entrySet().iterator();
+							while (iter.hasNext()) {
+								Entry<Object, Object> entry = iter.next();
+								String key = entry.getKey().toString();
+								Object value = entry.getValue();
+
+								data.put(key, value);
+							}
+
+							data.put("originalID", tileID);
+							data.put("layerIndex", layer);
+
+							if (data.containsKey("newX") && data.containsKey("newY")) {
+								data.put("newID", tileID + Integer.parseInt(data.get("newX").toString()) + (Integer.parseInt(data.get("newY").toString()) * map.findTileSet(tileID).tilesAcross));
+							}
+
+							Class<?> scriptClass = Class.forName("scripts." + scriptName.substring(0, 1).toUpperCase() + scriptName.substring(1) + "Script");
+							Constructor<?> constructor = scriptClass.getConstructor(Sound.class, HashMap.class);
+
+							String soundRef = data.get("sfx").toString();
+							AbstractTileScript script = (AbstractTileScript) constructor.newInstance(ResourceManager.getSound(soundRef), data);
+
+							ScriptBlock scriptBlock = new ScriptBlock(x * map.getTileWidth(), y * map.getTileHeight(), Globals.TILE_SIZE, Globals.TILE_SIZE);
+							scriptBlock.setScript(script);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -191,8 +243,7 @@ public class Map {
 			for (int y = 0; y < map.getHeight(); y++) {
 				Image imgBlock = map.getTileImage(x, y, MapObjects.LAYER_COLLISION);
 				if (imgBlock != null) {
-					Block block = new Block(x * map.getTileWidth(), y * map.getTileHeight(), imgBlock.getWidth(), imgBlock.getHeight());
-					Engine.addEntity(block);
+					new BlockedBlock(x * map.getTileWidth(), y * map.getTileHeight(), imgBlock.getWidth(), imgBlock.getHeight());
 				}
 			}
 		}
