@@ -85,24 +85,25 @@ public class Player extends AbstractEntity {
 			}
 		}
 	}
-
+	
 	@Override
 	public void update(int delta) {
 		super.update(delta);
 
 		setMoving(false);
 
-		if (Engine.isInputDown(Controls.MOVE_LEFT) && getCollidingEntity(Globals.DIRECTION_LEFT) == null) {
-			moveX(true);
-		}
-		if (Engine.isInputDown(Controls.MOVE_RIGHT) && getCollidingEntity(Globals.DIRECTION_RIGHT) == null) {
-			moveX(false);
-		}
 		if (Engine.isInputDown(Controls.MOVE_UP) && getCollidingEntity(Globals.DIRECTION_UP) == null) {
 			moveY(true);
 		}
-		if (Engine.isInputDown(Controls.MOVE_DOWN) && getCollidingEntity(Globals.DIRECTION_DOWN) == null) {
+		else if (Engine.isInputDown(Controls.MOVE_DOWN) && getCollidingEntity(Globals.DIRECTION_DOWN) == null) {
 			moveY(false);
+		}
+		
+		if (Engine.isInputDown(Controls.MOVE_LEFT) && getCollidingEntity(Globals.DIRECTION_LEFT) == null) {
+			moveX(true);
+		}
+		else if (Engine.isInputDown(Controls.MOVE_RIGHT) && getCollidingEntity(Globals.DIRECTION_RIGHT) == null) {
+			moveX(false);
 		}
 	}
 

@@ -19,7 +19,7 @@ public class MapChangeTransition implements TiledMapTransition {
 
 	private Color color = Color.black;
 
-	private int fadeTime = 500;
+	private int fadeTime = 250;
 
 	private boolean completeFadeOut = false;
 	private boolean completeFadeIn = false;

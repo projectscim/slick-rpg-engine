@@ -13,14 +13,14 @@ import org.newdawn.slick.font.effects.ColorEffect;
  */
 public class FontFactory {
 
-	public static final int SIZE_STANDARD = 12;
+	public static final int SIZE_STANDARD = 14;
 
 	@SuppressWarnings("unchecked")
-	public static UnicodeFont createFont(String ref) {
+	public static UnicodeFont createFont(String ref, Color color) {
 		try {
 			UnicodeFont font = new UnicodeFont(ref, SIZE_STANDARD, false, false);
+			font.getEffects().add(new ColorEffect(color));
 			font.addAsciiGlyphs();
-			font.getEffects().add(new ColorEffect(Color.black));
 			font.loadGlyphs();
 			return font;
 		} catch (SlickException e) {
@@ -28,6 +28,10 @@ public class FontFactory {
 		}
 
 		return null;
+	}
+
+	public static UnicodeFont createFont(String ref) {
+		return createFont(ref, Color.black);
 	}
 
 }

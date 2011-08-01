@@ -32,5 +32,6 @@ public class Globals {
 
 	// state IDs
 	public static final int STATE_WORLD = 10;
+	public static final int STATE_LOADING = 20;
 
 }
