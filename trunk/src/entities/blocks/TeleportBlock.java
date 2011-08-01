@@ -7,6 +7,8 @@ import main.constants.MapObjects;
 
 import org.newdawn.slick.Color;
 
+import tools.ResourceManager;
+
 import entities.AbstractEntity;
 
 /**
@@ -34,6 +36,10 @@ public class TeleportBlock extends AbstractEntity implements Block {
 
 		AbstractEntity player = Engine.getEntity(MapObjects.ENTITY_PLAYER);
 		if (getDistance(player) <= 10) {
+			if (!ResourceManager.getSound("teleport").playing()) {
+				ResourceManager.getSound("teleport").play();
+			}
+
 			player.setCanMove(false);
 			player.setRotation(player.getRotation() + 1 * delta);
 			player.setAlpha(player.getAlpha() - .02f);

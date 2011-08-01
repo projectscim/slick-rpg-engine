@@ -145,7 +145,7 @@ public class Engine {
 
 		ResourceManager.load();
 
-		container.setDefaultFont(ResourceManager.getFont("fipps"));
+		container.setDefaultFont(ResourceManager.getFont("visitor"));
 	}
 
 	/**
@@ -364,6 +364,10 @@ public class Engine {
 
 	public static void setTransition(Transition transition) {
 		Engine.transition = transition;
+	}
+
+	public static GameContainer getContainer() {
+		return container;
 	}
 
 }
